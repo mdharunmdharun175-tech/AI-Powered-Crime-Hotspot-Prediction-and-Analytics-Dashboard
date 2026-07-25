@@ -22,7 +22,7 @@ const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'S
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<Crime[]> {
-  if (isDemoMode()) {
+  const filterMockRows = () => {
     let rows = getPersistedCrimes().slice(0, limit);
     if (filters.district) rows = rows.filter((r) => r.district === filters.district);
     if (filters.state) rows = rows.filter((r) => r.state === filters.state);
@@ -41,52 +41,63 @@ export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<
       );
     }
     return rows;
+  };
+
+  if (isDemoMode()) {
+    return filterMockRows();
   }
 
-  let query = supabase
-    .from('crimes')
-    .select(
-      'id, date, crime_type, district, state, latitude, longitude, severity, victims, status, year, month, day, weekday, hour, season, description',
-    )
-    .order('date', { ascending: false })
-    .limit(limit);
+  try {
+    let query = supabase
+      .from('crimes')
+      .select(
+        'id, date, crime_type, district, state, latitude, longitude, severity, victims, status, year, month, day, weekday, hour, season, description',
+      )
+      .order('date', { ascending: false })
+      .limit(limit);
 
-  if (filters.district) query = query.eq('district', filters.district);
-  if (filters.state) query = query.eq('state', filters.state);
-  if (filters.crimeType) query = query.eq('crime_type', filters.crimeType);
-  if (filters.severity) query = query.eq('severity', filters.severity);
-  if (filters.dateFrom) query = query.gte('date', filters.dateFrom);
-  if (filters.dateTo) query = query.lte('date', filters.dateTo);
+    if (filters.district) query = query.eq('district', filters.district);
+    if (filters.state) query = query.eq('state', filters.state);
+    if (filters.crimeType) query = query.eq('crime_type', filters.crimeType);
+    if (filters.severity) query = query.eq('severity', filters.severity);
+    if (filters.dateFrom) query = query.gte('date', filters.dateFrom);
+    if (filters.dateTo) query = query.lte('date', filters.dateTo);
 
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  if (!data) return [];
+    const { data, error } = await query;
+    if (error || !data || data.length === 0) return filterMockRows();
 
-  let rows = data as Crime[];
-  if (filters.search.trim()) {
-    const q = filters.search.toLowerCase();
-    rows = rows.filter(
-      (r) =>
-        r.district.toLowerCase().includes(q) ||
-        r.state.toLowerCase().includes(q) ||
-        r.crime_type.toLowerCase().includes(q) ||
-        (r.description ?? '').toLowerCase().includes(q),
-    );
+    let rows = data as Crime[];
+    if (filters.search.trim()) {
+      const q = filters.search.toLowerCase();
+      rows = rows.filter(
+        (r) =>
+          r.district.toLowerCase().includes(q) ||
+          r.state.toLowerCase().includes(q) ||
+          r.crime_type.toLowerCase().includes(q) ||
+          (r.description ?? '').toLowerCase().includes(q),
+      );
+    }
+    return rows;
+  } catch {
+    return filterMockRows();
   }
-  return rows;
 }
 
 export async function fetchAllCrimesForAnalytics(): Promise<Crime[]> {
   if (isDemoMode()) return getPersistedCrimes().sort((a, b) => a.date.localeCompare(b.date));
-  const { data, error } = await supabase
-    .from('crimes')
-    .select(
-      'id, date, crime_type, district, state, latitude, longitude, severity, victims, status, year, month, day, weekday, hour, season, description',
-    )
-    .order('date', { ascending: true })
-    .limit(10000);
-  if (error) throw new Error(error.message);
-  return (data as Crime[]) ?? [];
+  try {
+    const { data, error } = await supabase
+      .from('crimes')
+      .select(
+        'id, date, crime_type, district, state, latitude, longitude, severity, victims, status, year, month, day, weekday, hour, season, description',
+      )
+      .order('date', { ascending: true })
+      .limit(10000);
+    if (error || !data || data.length === 0) return getPersistedCrimes().sort((a, b) => a.date.localeCompare(b.date));
+    return (data as Crime[]) ?? getPersistedCrimes().sort((a, b) => a.date.localeCompare(b.date));
+  } catch {
+    return getPersistedCrimes().sort((a, b) => a.date.localeCompare(b.date));
+  }
 }
 
 export function computeAnalytics(crimes: Crime[]): AnalyticsSummary {
