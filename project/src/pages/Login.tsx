@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
-import { ShieldCheck, Mail, Lock, User as UserIcon, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, User as UserIcon, AlertCircle, ArrowRight, Eye, EyeOff, FlaskConical } from 'lucide-react';
 import { useAuth } from '../services/authContext';
 import { Button } from '../components/ui/Button';
 
 export function Login() {
-  const { signIn, signUp, loading, error } = useAuth();
+  const { signIn, signUp, loading, error, isDemo } = useAuth();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('admin@crimescope.ai');
   const [password, setPassword] = useState('Admin@123');
@@ -107,6 +107,16 @@ export function Login() {
                 ? 'Sign in to access the analytics dashboard.'
                 : 'Sign up as an analyst to start exploring crime data.'}
             </p>
+
+            {isDemo && (
+              <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-300">
+                <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+                <span>
+                  <span className="font-semibold text-amber-200">Demo Mode Active</span> — Supabase backend is unreachable.
+                  Use a demo account below to explore all features with sample data.
+                </span>
+              </div>
+            )}
 
             <form onSubmit={submit} className="mt-6 space-y-4">
               {mode === 'signup' && (

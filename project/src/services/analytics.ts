@@ -1,4 +1,6 @@
 import { supabase } from './supabaseClient';
+import { isDemoMode } from './demoMode';
+import { MOCK_CRIMES } from './mockData';
 import type {
   Crime,
   AnalyticsSummary,
@@ -20,6 +22,27 @@ const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'S
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<Crime[]> {
+  if (isDemoMode()) {
+    let rows = MOCK_CRIMES.slice(0, limit);
+    if (filters.district) rows = rows.filter((r) => r.district === filters.district);
+    if (filters.state) rows = rows.filter((r) => r.state === filters.state);
+    if (filters.crimeType) rows = rows.filter((r) => r.crime_type === filters.crimeType);
+    if (filters.severity) rows = rows.filter((r) => r.severity === filters.severity);
+    if (filters.dateFrom) rows = rows.filter((r) => r.date >= filters.dateFrom!);
+    if (filters.dateTo) rows = rows.filter((r) => r.date <= filters.dateTo!);
+    if (filters.search.trim()) {
+      const q = filters.search.toLowerCase();
+      rows = rows.filter(
+        (r) =>
+          r.district.toLowerCase().includes(q) ||
+          r.state.toLowerCase().includes(q) ||
+          r.crime_type.toLowerCase().includes(q) ||
+          (r.description ?? '').toLowerCase().includes(q),
+      );
+    }
+    return rows;
+  }
+
   let query = supabase
     .from('crimes')
     .select(
@@ -54,6 +77,7 @@ export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<
 }
 
 export async function fetchAllCrimesForAnalytics(): Promise<Crime[]> {
+  if (isDemoMode()) return [...MOCK_CRIMES].sort((a, b) => a.date.localeCompare(b.date));
   const { data, error } = await supabase
     .from('crimes')
     .select(

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import {
   LayoutDashboard, BarChart3, Brain, Map, Lightbulb, FileText, Users,
-  ShieldCheck, Moon, Sun, LogOut, ChevronDown, Menu, X, Bell,
+  ShieldCheck, Moon, Sun, LogOut, ChevronDown, Menu, X, Bell, FlaskConical,
 } from 'lucide-react';
 import { useAuth } from '../services/authContext';
 import { useTheme } from '../services/themeContext';
@@ -35,7 +35,7 @@ export function AppShell({
   setPage: (p: string) => void;
   children: ReactNode;
 }) {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, isDemo } = useAuth();
   const { theme, toggle } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -141,6 +141,12 @@ export function AppShell({
 
           <div className="flex items-center gap-2">
             <h1 className="font-display text-base font-bold text-slate-800 dark:text-white">{activeLabel}</h1>
+            {isDemo && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500">
+                <FlaskConical className="h-3 w-3" />
+                Demo
+              </span>
+            )}
           </div>
 
           <div className="ml-auto flex items-center gap-2">
