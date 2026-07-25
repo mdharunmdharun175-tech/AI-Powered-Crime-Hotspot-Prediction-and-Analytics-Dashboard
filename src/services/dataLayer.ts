@@ -1,11 +1,12 @@
 import { supabase } from './supabaseClient';
 import { isDemoMode } from './demoMode';
 import {
-  MOCK_CRIMES,
   MOCK_INSIGHTS,
   MOCK_REPORTS,
   MOCK_DISTRICTS,
   MOCK_PROFILES,
+  getPersistedCrimes,
+  saveMockIncident,
 } from './mockData';
 import type { Crime, Insight, ReportRecord, Profile, UserRole } from './types';
 
@@ -122,7 +123,7 @@ export async function updateProfileRole(id: string, role: UserRole): Promise<voi
 }
 
 export async function fetchCrimesForMap(limit = 2000): Promise<Crime[]> {
-  if (isDemoMode()) return MOCK_CRIMES.slice(0, limit);
+  if (isDemoMode()) return getPersistedCrimes().slice(0, limit);
   const { data, error } = await supabase
     .from('crimes')
     .select(
@@ -132,6 +133,19 @@ export async function fetchCrimesForMap(limit = 2000): Promise<Crime[]> {
     .limit(limit);
   if (error) throw new Error(error.message);
   return (data as Crime[]) ?? [];
+}
+
+export async function createIncident(crimeData: Omit<Crime, 'id'>): Promise<Crime> {
+  if (isDemoMode()) {
+    return saveMockIncident(crimeData);
+  }
+  const { data, error } = await supabase
+    .from('crimes')
+    .insert([crimeData])
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data as Crime;
 }
 
 /**

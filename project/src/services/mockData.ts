@@ -202,3 +202,33 @@ export const MOCK_REPORTS: ReportRecord[] = [
 ];
 
 export const MOCK_DISTRICTS = DISTRICTS.map(({ district, state }) => ({ district, state }));
+
+const LOCAL_STORAGE_KEY = 'crimescope_custom_incidents';
+
+export function getPersistedCrimes(): Crime[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return MOCK_CRIMES;
+    const custom: Crime[] = JSON.parse(raw);
+    return [...custom, ...MOCK_CRIMES].sort((a, b) => b.date.localeCompare(a.date));
+  } catch {
+    return MOCK_CRIMES;
+  }
+}
+
+export function saveMockIncident(crime: Omit<Crime, 'id'>): Crime {
+  const newIncident: Crime = {
+    ...crime,
+    id: `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+  };
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const existing: Crime[] = raw ? JSON.parse(raw) : [];
+    existing.unshift(newIncident);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existing));
+  } catch {
+    // Ignore storage errors
+  }
+  return newIncident;
+}
+

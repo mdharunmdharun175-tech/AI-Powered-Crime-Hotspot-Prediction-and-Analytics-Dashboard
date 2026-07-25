@@ -12,6 +12,7 @@ import { CrimeMap } from './pages/CrimeMap';
 import { Insights } from './pages/Insights';
 import { Reports } from './pages/Reports';
 import { Admin } from './pages/Admin';
+import { PatrolPlanner } from './pages/PatrolPlanner';
 import { Spinner } from './components/ui/Feedback';
 
 const PAGES_WITH_FILTERS = ['dashboard', 'analytics', 'prediction', 'insights', 'reports'];
@@ -45,6 +46,7 @@ function AppInner() {
         {page === 'analytics' && <Analytics />}
         {page === 'prediction' && <Prediction />}
         {page === 'map' && <CrimeMap />}
+        {page === 'patrol' && <PatrolPlanner />}
         {page === 'insights' && <Insights />}
         {page === 'reports' && <Reports />}
         {page === 'admin' && <Admin />}

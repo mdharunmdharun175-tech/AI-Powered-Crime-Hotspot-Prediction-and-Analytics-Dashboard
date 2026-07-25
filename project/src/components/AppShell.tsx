@@ -2,7 +2,10 @@ import { useState, type ReactNode } from 'react';
 import {
   LayoutDashboard, BarChart3, Brain, Map, Lightbulb, FileText, Users,
   ShieldCheck, Moon, Sun, LogOut, ChevronDown, Menu, X, Bell, FlaskConical,
+  ShieldAlert, Bot, Plus,
 } from 'lucide-react';
+import { CopilotDrawer } from './CopilotDrawer';
+import { NewIncidentModal } from './NewIncidentModal';
 import { useAuth } from '../services/authContext';
 import { useTheme } from '../services/themeContext';
 import { Badge } from './ui/Badge';
@@ -21,6 +24,7 @@ const NAV: NavItem[] = [
   { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4.5 w-4.5" /> },
   { id: 'prediction', label: 'Prediction', icon: <Brain className="h-4.5 w-4.5" /> },
   { id: 'map', label: 'Crime Map', icon: <Map className="h-4.5 w-4.5" /> },
+  { id: 'patrol', label: 'Patrol Planner', icon: <ShieldAlert className="h-4.5 w-4.5" /> },
   { id: 'insights', label: 'AI Insights', icon: <Lightbulb className="h-4.5 w-4.5" /> },
   { id: 'reports', label: 'Reports', icon: <FileText className="h-4.5 w-4.5" /> },
   { id: 'admin', label: 'Admin', icon: <Users className="h-4.5 w-4.5" />, roles: ['admin'] },
@@ -39,6 +43,8 @@ export function AppShell({
   const { theme, toggle } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [copilotOpen, setCopilotOpen] = useState(false);
+  const [incidentModalOpen, setIncidentModalOpen] = useState(false);
 
   const visibleNav = NAV.filter((n) => !n.roles || n.roles.includes(profile?.role as UserRole));
   const activeLabel = NAV.find((n) => n.id === page)?.label ?? 'Dashboard';
@@ -151,6 +157,22 @@ export function AppShell({
 
           <div className="ml-auto flex items-center gap-2">
             <button
+              onClick={() => setIncidentModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-red-500 transition-colors"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Log Incident</span>
+            </button>
+
+            <button
+              onClick={() => setCopilotOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-cyan-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
+            >
+              <Bot className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Copilot AI</span>
+            </button>
+
+            <button
               onClick={toggle}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
               title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
@@ -208,6 +230,13 @@ export function AppShell({
           <div className="mx-auto max-w-[1600px] animate-fade-in">{children}</div>
         </main>
       </div>
+
+      <CopilotDrawer isOpen={copilotOpen} onClose={() => setCopilotOpen(false)} />
+      <NewIncidentModal
+        isOpen={incidentModalOpen}
+        onClose={() => setIncidentModalOpen(false)}
+        onIncidentCreated={() => window.location.reload()}
+      />
     </div>
   );
 }

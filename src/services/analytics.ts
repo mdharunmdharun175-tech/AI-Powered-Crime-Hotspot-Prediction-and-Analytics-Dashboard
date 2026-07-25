@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient';
 import { isDemoMode } from './demoMode';
-import { MOCK_CRIMES } from './mockData';
+import { getPersistedCrimes } from './mockData';
 import type {
   Crime,
   AnalyticsSummary,
@@ -23,7 +23,7 @@ const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<Crime[]> {
   if (isDemoMode()) {
-    let rows = MOCK_CRIMES.slice(0, limit);
+    let rows = getPersistedCrimes().slice(0, limit);
     if (filters.district) rows = rows.filter((r) => r.district === filters.district);
     if (filters.state) rows = rows.filter((r) => r.state === filters.state);
     if (filters.crimeType) rows = rows.filter((r) => r.crime_type === filters.crimeType);
@@ -77,7 +77,7 @@ export async function fetchCrimes(filters: CrimeFilters, limit = 5000): Promise<
 }
 
 export async function fetchAllCrimesForAnalytics(): Promise<Crime[]> {
-  if (isDemoMode()) return [...MOCK_CRIMES].sort((a, b) => a.date.localeCompare(b.date));
+  if (isDemoMode()) return getPersistedCrimes().sort((a, b) => a.date.localeCompare(b.date));
   const { data, error } = await supabase
     .from('crimes')
     .select(

@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl, useMap } f
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
-import { MapPin, Flame, AlertTriangle } from 'lucide-react';
+import { MapPin, Flame, AlertTriangle, Download } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Select } from '../components/ui/Select';
@@ -94,6 +94,38 @@ export function CrimeMap() {
     return [22.5937, 79.9629]; // India center
   }, [hotspots, filtered]);
 
+  const exportGeoJSON = () => {
+    const geojson = {
+      type: 'FeatureCollection',
+      features: filtered.map((c) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [Number(c.longitude), Number(c.latitude)],
+        },
+        properties: {
+          id: c.id,
+          date: c.date,
+          crime_type: c.crime_type,
+          district: c.district,
+          state: c.state,
+          severity: c.severity,
+          victims: c.victims,
+          status: c.status,
+        },
+      })),
+    };
+
+    const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/geo+json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `CrimeScope_Hotspots_${new Date().toISOString().split('T')[0]}.geojson`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <div className="space-y-5">
@@ -116,6 +148,14 @@ export function CrimeMap() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={exportGeoJSON}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export GeoJSON
+          </button>
+
           <div className="flex rounded-lg border border-slate-200 p-0.5 dark:border-slate-700">
             <button
               onClick={() => setView('hotspots')}
