@@ -16,7 +16,7 @@ const CRIME_TYPES: CrimeType[] = [
   'Kidnapping', 'Homicide', 'Sexual Offense', 'Drug Offense',
 ];
 
-const SEVERITIES: CrimeSeverity[] = ['Low', 'Medium', 'High', 'Critical'];
+const SEVERITIES: CrimeSeverity[] = ['Critical', 'High', 'Medium', 'Low'];
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

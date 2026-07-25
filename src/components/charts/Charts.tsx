@@ -28,7 +28,13 @@ ChartJS.register(
 );
 
 const BRAND = '#2563eb';
-const RISK_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899'];
+const SEVERITY_COLORS: Record<string, string> = {
+  Critical: '#dc2626',
+  High: '#ef4444',
+  Medium: '#f97316',
+  Low: '#10b981',
+};
+const RISK_COLORS = ['#dc2626', '#ef4444', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899'];
 const PALETTE = ['#2563eb', '#06b6d4', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#6366f1'];
 
 function useChartTheme() {
@@ -220,7 +226,7 @@ export function DoughnutChart({ labels, data, height = 260 }: Omit<BaseProps, 'l
           datasets: [
             {
               data,
-              backgroundColor: labels.map((_, i) => RISK_COLORS[i % RISK_COLORS.length]),
+              backgroundColor: labels.map((l, i) => SEVERITY_COLORS[l] ?? RISK_COLORS[i % RISK_COLORS.length]),
               borderColor: 'transparent',
               borderWidth: 2,
               hoverOffset: 8,

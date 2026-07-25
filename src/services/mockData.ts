@@ -16,7 +16,7 @@ const CRIME_TYPES: CrimeType[] = [
   'Theft', 'Burglary', 'Robbery', 'Vehicle Theft', 'Assault',
   'Cybercrime', 'Kidnapping', 'Homicide', 'Sexual Offense', 'Drug Offense',
 ];
-const SEVERITIES: CrimeSeverity[] = ['Low', 'Medium', 'High', 'Critical'];
+
 const STATUSES: CrimeStatus[] = ['Open', 'Under Investigation', 'Closed', 'Arrest Made'];
 
 
@@ -71,7 +71,7 @@ function seasonFromMonth(m: number): string {
   return 'Post-Monsoon';
 }
 
-// Generate 800 realistic crime records seeded deterministically
+// Generate 800 realistic crime records seeded deterministically with high Critical proportion
 export const MOCK_CRIMES: Crime[] = (() => {
   const rand = rng(42);
   const crimes: Crime[] = [];
@@ -84,14 +84,13 @@ export const MOCK_CRIMES: Crime[] = (() => {
     const hour = randInt(0, 23, rand);
     const weekday = new Date(year, month - 1, day).getDay();
 
-    // Higher crime frequency in high-density cities
-    const densityBias = ['Mumbai', 'Delhi', 'Bengaluru'].includes(dist.district);
-    if (densityBias && rand() > 0.6) {
-      // retry with same district
-    }
-
     const crimeType = pick(CRIME_TYPES, rand);
-    const severity = pick(SEVERITIES, rand);
+    
+    // Higher weighting for Critical and High severity
+    const rSev = rand();
+    const severity: CrimeSeverity =
+      rSev < 0.42 ? 'Critical' : rSev < 0.72 ? 'High' : rSev < 0.88 ? 'Medium' : 'Low';
+      
     const status = pick(STATUSES, rand);
 
     crimes.push({
@@ -231,4 +230,3 @@ export function saveMockIncident(crime: Omit<Crime, 'id'>): Crime {
   }
   return newIncident;
 }
-
