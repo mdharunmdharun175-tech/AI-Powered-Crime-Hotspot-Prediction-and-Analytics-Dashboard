@@ -45,17 +45,10 @@ Clone the repository and install the project dependencies:
 ```bash
 npm install
 ```
-
+Visualization Link:https:AI-Powered-Crime-Hotspot-Prediction-and-Analytics-Dashboard/
 ---
 
-## 🔑 Environment Variables Configuration
 
-Before running the application, you must configure your Supabase credentials. Create a `.env` file in the root directory (`d:/zoho/zoho/.env`) and add your project URL and anonymous API key:
-
-```env
-VITE_SUPABASE_URL=https://tmfcxzxfdbfqahhojqnj.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtZmN4enhmZGJmcWFoaG9qcW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMTcyMDYsImV4cCI6MjA5ODc5MzIwNn0.R-1zIIGhoZf_8jaFCT9E6NM8a-Ga56E4oqbrtWReutY
-```
 
 > [!IMPORTANT]
 > **How to obtain your Supabase keys:**
