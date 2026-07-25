@@ -45,7 +45,9 @@ Clone the repository and install the project dependencies:
 ```bash
 npm install
 ```
-Visualization Link:https:AI-Powered-Crime-Hotspot-Prediction-and-Analytics-Dashboard/
+
+Visualization Link:https: //mdharunmdharun175-tech.github.io/AI-Powered-Crime-Hotspot-Prediction-and-Analytics-Dashboard/
+
 ---
 
 
